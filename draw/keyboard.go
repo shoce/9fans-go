@@ -1,6 +1,10 @@
 package draw
 
-import "log"
+import (
+	"log"
+	"io"
+	"os"
+)
 
 const (
 	KeyFn = '\uF000'
@@ -41,8 +45,12 @@ func (d *Display) InitKeyboard() *Keyboardctl {
 func kbdproc(d *Display, ch chan rune) {
 	for {
 		r, err := d.conn.ReadKbd()
-		if err != nil {
-			log.Fatal("readkbd: ", err)
+		if err == io.EOF {
+			log.Println("readkbd: EOF")
+			os.Exit(0)
+		} else if err != nil {
+			log.Println("readkbd: ", err)
+			os.Exit(1)
 		}
 		ch <- r
 	}
